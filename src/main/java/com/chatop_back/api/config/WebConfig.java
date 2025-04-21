@@ -14,5 +14,5 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowedOrigins("http://localhost:4200") // Autoriser l'origine du frontend
                 .allowedMethods("GET", "POST", "PUT", "DELETE") // Méthodes HTTP autorisées
                 .allowedHeaders("*"); // Autoriser tous les en-têtes
-    }
+    }   
 }

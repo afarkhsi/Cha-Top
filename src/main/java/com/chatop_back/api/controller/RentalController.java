@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,13 +23,20 @@ public class RentalController {
     @Operation(summary = "Get all rentals", description = "Retrieve a list of all rentals")
     @GetMapping("")
     public RentalsResponse getAllRentals() {
-        List<Rental> rentals = rentalService.getRentals();
-        return new RentalsResponse(rentals); // <-- ici on wrap dans un objet avec clé "rentals"
-    }
-    /**public Iterable<Rental> getAllRentals() {
-        return rentalService.getRentals();
-    }**/
+        Iterable<Rental> rentals = rentalService.getRentals();
 
+        List<RentalSingleResponse> rentalSingleResponses = new ArrayList<>();
+
+        // Mapping des Rentals vers RentalSingleResponse
+        for (Rental rental : rentals) {
+            rentalSingleResponses.add(new RentalSingleResponse(rental));
+        }
+
+        // Retourner un RentalsResponse avec la liste des RentalSingleResponse
+        return new RentalsResponse(rentalSingleResponses);
+    }
+
+   
 
     @Operation(summary = "Get rental by ID", description = "Retrieve rental details by rental ID")
     @GetMapping("/{id}")
