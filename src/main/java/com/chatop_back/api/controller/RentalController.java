@@ -6,12 +6,15 @@ import com.chatop_back.api.payload.RentalsResponse;
 import com.chatop_back.api.service.RentalService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/rentals")
@@ -19,10 +22,33 @@ public class RentalController {
 
     @Autowired
     private RentalService rentalService;
+    
+    @Autowired
+    private ModelMapper modelMapper;
 
     @Operation(summary = "Get all rentals", description = "Retrieve a list of all rentals")
     @GetMapping("")
     public RentalsResponse getAllRentals() {
+        List<Rental> rentals = rentalService.getRentals();
+        List<RentalSingleResponse> rentalSingleResponses = rentals.stream()
+                .map(rental -> modelMapper.map(rental, RentalSingleResponse.class))
+                .collect(Collectors.toList());
+        return new RentalsResponse(rentalSingleResponses);
+    }
+   /** public RentalsResponse getAllRentals() {
+        // Récupérer toutes les locations
+        List<Rental> rentals = rentalService.getRentals();
+
+        // Utiliser ModelMapper pour convertir les entités Rental en RentalSingleResponse
+        List<RentalSingleResponse> rentalSingleResponses = rentals.stream()
+                .map(rental -> modelMapper.map(rental, RentalSingleResponse.class))  // Conversion via ModelMapper
+                .collect(Collectors.toList());
+
+        // Retourner un RentalsResponse avec la liste des RentalSingleResponse
+        return new RentalsResponse(rentalSingleResponses);
+    }**/
+    
+    /** public RentalsResponse getAllRentals() {
         Iterable<Rental> rentals = rentalService.getRentals();
 
         List<RentalSingleResponse> rentalSingleResponses = new ArrayList<>();
@@ -34,7 +60,7 @@ public class RentalController {
 
         // Retourner un RentalsResponse avec la liste des RentalSingleResponse
         return new RentalsResponse(rentalSingleResponses);
-    }
+    }**/
 
    
 

@@ -7,26 +7,20 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 public class SecurityConfig {
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        // Configuration de la sécurité pour les routes
-        http.csrf(csrf -> csrf.disable())
-            .authorizeHttpRequests((authorizeRequests) -> authorizeRequests
-                // Autoriser l'accès sans authentification à Swagger et aux routes d'API
-                .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**", "/api/rentals/**", "/api/messages/**",
-                        "/api/rentals/**",
-                        "/api/user/**",
-                        "/api/auth/**") // Ajoute l'accès aux API
-                .permitAll() // Permet l'accès sans authentification
-                .anyRequest().authenticated() // Toute autre requête doit être authentifiée
+        http
+            .csrf(csrf -> csrf.disable())
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**", 
+                                 "/api/rentals/**", "/api/messages/**", "/api/user/**", "/api/auth/**")
+                .permitAll()
+                .anyRequest().authenticated()
             )
-            .formLogin((formLogin) -> formLogin
-                .loginPage("/login") // URL de la page de connexion (si tu en as une)
-                .permitAll() // Permet l'accès à la page de login sans authentification
+            .formLogin(form -> form
+                .loginPage("/login")
+                .permitAll()
             );
-
-        return http.build(); // Important dans Spring Boot 3.x et Spring Security 6.x
+        return http.build();
     }
 }
-
