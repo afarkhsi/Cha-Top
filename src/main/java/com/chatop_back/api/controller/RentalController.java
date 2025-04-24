@@ -11,7 +11,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -35,35 +34,7 @@ public class RentalController {
                 .collect(Collectors.toList());
         return new RentalsResponse(rentalSingleResponses);
     }
-   /** public RentalsResponse getAllRentals() {
-        // Récupérer toutes les locations
-        List<Rental> rentals = rentalService.getRentals();
-
-        // Utiliser ModelMapper pour convertir les entités Rental en RentalSingleResponse
-        List<RentalSingleResponse> rentalSingleResponses = rentals.stream()
-                .map(rental -> modelMapper.map(rental, RentalSingleResponse.class))  // Conversion via ModelMapper
-                .collect(Collectors.toList());
-
-        // Retourner un RentalsResponse avec la liste des RentalSingleResponse
-        return new RentalsResponse(rentalSingleResponses);
-    }**/
-    
-    /** public RentalsResponse getAllRentals() {
-        Iterable<Rental> rentals = rentalService.getRentals();
-
-        List<RentalSingleResponse> rentalSingleResponses = new ArrayList<>();
-
-        // Mapping des Rentals vers RentalSingleResponse
-        for (Rental rental : rentals) {
-            rentalSingleResponses.add(new RentalSingleResponse(rental));
-        }
-
-        // Retourner un RentalsResponse avec la liste des RentalSingleResponse
-        return new RentalsResponse(rentalSingleResponses);
-    }**/
-
    
-
     @Operation(summary = "Get rental by ID", description = "Retrieve rental details by rental ID")
     @GetMapping("/{id}")
     public Optional<Rental> getRentalById(@Parameter(description = "ID of the rental to retrieve") @PathVariable Long id) {

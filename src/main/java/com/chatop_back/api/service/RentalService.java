@@ -29,20 +29,20 @@ public class RentalService {
         return rentalRepository.save(rental);
     }
 
-    // Méthode pour mettre à jour une location par son ID
+    // Méthode pour mettre à jour une rental par son ID
     public Rental updateRental(Long id, Rental rental) {
-        // Vérifie si la location existe déjà
+        // Vérifie si la rental existe déjà
         Rental existingRental = rentalRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Location not found"));
 
-        // Mettre à jour les informations de la location
-        existingRental.setName(rental.getName());  // Exemples de champs à mettre à jour
+        // Mettre à jour les informations de la rental
+        existingRental.setName(rental.getName()); 
         existingRental.setDescription(rental.getDescription());
         existingRental.setPrice(rental.getPrice());
    
         // Ajoute d'autres champs à mettre à jour selon tes besoins.
 
-        // Sauvegarde la location mise à jour dans la base de données
+        // Sauvegarde la rental mise à jour dans la base de données
         return rentalRepository.save(existingRental);
     }
 

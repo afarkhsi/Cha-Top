@@ -17,7 +17,6 @@ import org.springframework.context.annotation.Configuration;
         description = "Documentation de l'API Chatop pour interagir avec les locations et utilisateurs"
     ), servers = {
             @Server(description = "Local ENV", url = "http://localhost:3001/"),
-            @Server(description = "Prod ENV (Work in progress)", url = "http://chatop.server/"),
 }
 )
 public class SwaggerConfig {

@@ -1,6 +1,7 @@
 package com.chatop_back.api.model;
 
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -31,6 +32,8 @@ public class Users {
     private String email;
     private String name;
     private String password;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "owner")
     @JsonIgnore 
