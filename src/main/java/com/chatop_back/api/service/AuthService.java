@@ -43,8 +43,8 @@ public class AuthService {
                 .email(registerRequest.getEmail())
                 .name(registerRequest.getName())
                 .password(passwordEncoder.encode(registerRequest.getPassword()))
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
+                .created_at(LocalDateTime.now())
+                .updated_at(LocalDateTime.now())
                 .build();
         
         user = userRepository.save(user);
@@ -62,8 +62,22 @@ public class AuthService {
                 .id(user.getId())
                 .email(user.getEmail())
                 .name(user.getName())
-                .createdAt(user.getCreatedAt())
-                .updatedAt(user.getUpdatedAt())
+                .created_at(user.getCreated_at())
+                .updated_at(user.getUpdated_at())
+                .build();
+    }
+    
+    // Nouvelle méthode pour récupérer l'utilisateur courant par son email
+    public UserDto getCurrentUserByEmail(String email) {
+        Users user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        
+        return UserDto.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .name(user.getName())
+                .created_at(user.getCreated_at())
+                .updated_at(user.getUpdated_at())
                 .build();
     }
 }

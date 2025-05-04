@@ -23,8 +23,8 @@ public class ModelMapperConfig {
 	            rental.getPicture(),
 	            rental.getDescription(),
 	            rental.getOwner().getId(),
-	            rental.getCreatedAt(),
-	            rental.getUpdatedAt()
+	            rental.getCreated_at(),
+	            rental.getUpdated_at()
 	        );
 	    }, Rental.class, RentalSingleResponse.class);
 	    

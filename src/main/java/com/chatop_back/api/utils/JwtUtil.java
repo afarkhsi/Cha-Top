@@ -4,6 +4,7 @@ import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import java.util.Date;
@@ -13,10 +14,11 @@ import javax.crypto.SecretKey;
 @Component
 public class JwtUtil {
 
-    // Une chaîne Base64 encodée plus longue comme secret (doit être d'au moins 512 bits après décodage)
-    private final String jwtSecretBase64 = "c29tZXJhbmRvbXN0cmluZ3RvZ2V0aGF0ZXZlcnl0aGluZ3dpbGwtYmUtYXQ1MTJi"
-            + "aXRzLWxlbmd0aC1vZi01MTI="; // Exemple, veille à utiliser un secret généré de manière sécurisée.
-    private final long jwtExpirationMs = 86400000; // 24h
+    @Value("${jwt.secret}")
+    private String jwtSecretBase64;
+
+    @Value("${jwt.expiration}")
+    private long jwtExpirationMs;
 
     // Génère un SecretKey à partir de la clé Base64
     private SecretKey getSigningKey() {

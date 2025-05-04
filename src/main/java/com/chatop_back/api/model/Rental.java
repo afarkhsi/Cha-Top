@@ -21,14 +21,14 @@ public class Rental {
     private String name;
     private double surface;
     private double price;
-    private String description;
     private String picture;
+    private String description;
 
     @Column(name = "created_at")
-    private LocalDateTime createdAt;
+    private LocalDateTime created_at;
 
     @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
+    private LocalDateTime updated_at;
 
     @ManyToOne
     @JoinColumn(name = "owner_id")

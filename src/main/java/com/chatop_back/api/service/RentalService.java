@@ -24,8 +24,8 @@ public class RentalService {
     }
 
     public Rental createRental(Rental rental) {
-        rental.setCreatedAt(LocalDateTime.now());
-        rental.setUpdatedAt(LocalDateTime.now());
+        rental.setCreated_at(LocalDateTime.now());
+        rental.setUpdated_at(LocalDateTime.now());
         return rentalRepository.save(rental);
     }
 

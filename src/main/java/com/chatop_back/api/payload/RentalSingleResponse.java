@@ -24,8 +24,8 @@ public record RentalSingleResponse(
 	            rental.getPicture(),
 	            rental.getDescription(),
 	            rental.getOwner().getId(), // ⬅️ ici on expose juste l'ID
-	            rental.getCreatedAt(),
-	            rental.getUpdatedAt()
+	            rental.getCreated_at(),
+	            rental.getUpdated_at()
 	        );
 	   }
 }
