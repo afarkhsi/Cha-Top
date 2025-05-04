@@ -17,15 +17,16 @@ public record RentalSingleResponse(
     // Constructeur pour créer la réponse à partir d'un objet Rental
     public RentalSingleResponse(Rental rental) {
         this(
-            rental != null ? rental.getId() : null,
-            rental != null ? rental.getName() : null,
-            rental != null ? rental.getSurface() : null,
-            rental != null ? rental.getPrice() : null,
-            rental != null ? rental.getPicture() : null,
-            rental != null ? rental.getDescription() : null,
-            rental != null && rental.getOwner() != null ? rental.getOwner().getId() : null,
-            rental != null ? rental.getCreated_at() : null,
-            rental != null ? rental.getUpdated_at() : null
+                rental.getId(),
+                rental.getName(),
+                rental.getSurface(),
+                rental.getPrice(),
+                // Ici, vous concaténez le chemin pour former l'URL complète
+                "http://localhost:3001/uploads/" + rental.getPicture(),
+                rental.getDescription(),
+                rental.getOwner().getId(),
+                rental.getCreated_at(),
+                rental.getUpdated_at()
         );
     }
 }

@@ -20,7 +20,7 @@ public class ModelMapperConfig {
 	            rental.getName(),
 	            rental.getSurface(),
 	            rental.getPrice(),
-	            rental.getPicture(),
+	            "http://localhost:3001/uploads/" + rental.getPicture(), 
 	            rental.getDescription(),
 	            rental.getOwner().getId(),
 	            rental.getCreated_at(),
