@@ -1,63 +1,127 @@
 package com.chatop_back.api.controller;
-
 import com.chatop_back.api.model.Rental;
 import com.chatop_back.api.payload.RentalSingleResponse;
 import com.chatop_back.api.payload.RentalsResponse;
+import com.chatop_back.api.repository.UserRepository;
 import com.chatop_back.api.service.RentalService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.web.multipart.MultipartFile;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("api/rentals")
+@RequestMapping("/api/rentals")
 public class RentalController {
 
-    @Autowired
-    private RentalService rentalService;
+    private final RentalService rentalService;
+    private final UserRepository userRepository; 
+    private final ModelMapper modelMapper;
     
-    @Autowired
-    private ModelMapper modelMapper;
+    @Value("${upload.directory:uploads}")
+    private String uploadDir;
 
-    // Endpoint pour récupérer toutes les locations
+    @Autowired
+    public RentalController(RentalService rentalService, UserRepository userRepository, ModelMapper modelMapper) {
+        this.rentalService = rentalService;
+        this.userRepository = userRepository;
+        this.modelMapper = modelMapper;
+    }
+
     @Operation(summary = "Get all rentals", description = "Retrieve a list of all rentals")
     @GetMapping("")
     public RentalsResponse getAllRentals() {
         List<Rental> rentals = rentalService.getRentals();
-        // Conversion de chaque entité en DTO
         List<RentalSingleResponse> rentalSingleResponses = rentals.stream()
                 .map(rental -> modelMapper.map(rental, RentalSingleResponse.class))
                 .collect(Collectors.toList());
         return new RentalsResponse(rentalSingleResponses);
     }
-   
-    // Endpoint pour récupérer une location par son ID (retourne le DTO)
+
     @Operation(summary = "Get rental by ID", description = "Retrieve rental details by rental ID")
     @GetMapping("/{id}")
-    public ResponseEntity<RentalSingleResponse> getRentalById(@Parameter(description = "ID of the rental to retrieve") 
-                                                              @PathVariable Long id) {
+    public ResponseEntity<RentalSingleResponse> getRentalById(
+            @Parameter(description = "ID of the rental to retrieve") @PathVariable Long id) {
         Rental rental = rentalService.getRentalById(id)
                 .orElseThrow(() -> new RuntimeException("Rental not found"));
         RentalSingleResponse response = modelMapper.map(rental, RentalSingleResponse.class);
         return ResponseEntity.ok(response);
     }
 
-    // Endpoint pour créer une location (retourne le DTO de la location créée)
-    @Operation(summary = "Create a new rental", description = "Create a new rental entry")
-    @PostMapping
-    public ResponseEntity<RentalSingleResponse> createRental(@RequestBody Rental rental) {
-        Rental createdRental = rentalService.createRental(rental);
-        RentalSingleResponse response = modelMapper.map(createdRental, RentalSingleResponse.class);
-        return ResponseEntity.ok(response);
+    // Endpoint pour créer une location avec upload d'image
+    @Operation(summary = "Create a new rental", description = "Create a new rental entry with image upload")
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<RentalSingleResponse> createRental(
+            @RequestParam("name") String name,
+            @RequestParam("surface") Double surface,
+            @RequestParam("price") Double price,
+            @RequestParam("description") String description,
+            @RequestParam("picture") MultipartFile picture) {
+        
+        try {
+            // Créer le répertoire d'upload s'il n'existe pas
+            Path uploadPath = Paths.get(uploadDir);
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
+            }
+            
+            // Générer un nom de fichier unique
+            String originalFilename = picture.getOriginalFilename();
+            String fileExtension = "";
+            if (originalFilename != null && originalFilename.contains(".")) {
+                fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
+            }
+            String fileName = UUID.randomUUID().toString() + fileExtension;
+            Path filePath = uploadPath.resolve(fileName);
+            
+            // Sauvegarder l'image
+            Files.copy(picture.getInputStream(), filePath);
+            
+            // Obtenir l'email de l'utilisateur authentifié
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String email = authentication.getName();
+            if (email == null || email.equals("anonymousUser")) {
+                return ResponseEntity.status(401).build(); // Non autorisé
+            }
+            
+            // Créer l'objet Rental (sans setter l'owner ici)
+            Rental rental = new Rental();
+            rental.setName(name);
+            rental.setSurface(surface);
+            rental.setPrice(price);
+            rental.setDescription(description);
+            rental.setPicture(fileName);  // On stocke le nom du fichier
+            
+            // La gestion de l'owner et des dates se fait dans le service
+            Rental createdRental = rentalService.createRental(rental, email);
+            RentalSingleResponse response = modelMapper.map(createdRental, RentalSingleResponse.class);
+            
+            return ResponseEntity.ok(response);
+            
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            // Ici, il vaudrait mieux retourner un objet d'erreur structuré ou un message dans le body.
+            return ResponseEntity.status(500)
+                    .body(new RentalSingleResponse(null, "Error: " + e.getMessage(), null, null, null, null, null, null, null));
+        }
     }
 
-    // Endpoint pour mettre à jour une location (retourne le DTO de la location mise à jour)
     @Operation(summary = "Update a rental", description = "Update an existing rental entry")
     @PutMapping("/{id}")
     public ResponseEntity<RentalSingleResponse> updateRental(@PathVariable Long id, @RequestBody Rental rental) {
@@ -66,7 +130,6 @@ public class RentalController {
         return ResponseEntity.ok(response);
     }
 
-    // Endpoint pour supprimer une location
     @Operation(summary = "Delete a rental", description = "Delete a rental by its ID")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteRental(@PathVariable Long id) {

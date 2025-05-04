@@ -1,10 +1,11 @@
 package com.chatop_back.api.service;
 
 import com.chatop_back.api.model.Rental;
+import com.chatop_back.api.model.Users;
 import com.chatop_back.api.repository.RentalRepository;
+import com.chatop_back.api.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -12,8 +13,14 @@ import java.util.Optional;
 @Service
 public class RentalService {
 
+    private final RentalRepository rentalRepository;
+    private final UserRepository userRepository;
+
     @Autowired
-    private RentalRepository rentalRepository;
+    public RentalService(RentalRepository rentalRepository, UserRepository userRepository) {
+        this.rentalRepository = rentalRepository;
+        this.userRepository = userRepository;
+    }
 
     public List<Rental> getRentals() {
         return rentalRepository.findAll();
@@ -23,26 +30,24 @@ public class RentalService {
         return rentalRepository.findById(id);
     }
 
-    public Rental createRental(Rental rental) {
+    // Nouvelle version de createRental qui gère l'assignation de l'owner et les dates
+    public Rental createRental(Rental rental, String userEmail) {
+        Users owner = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new RuntimeException("User not found: " + userEmail));
+        rental.setOwner(owner);
         rental.setCreated_at(LocalDateTime.now());
         rental.setUpdated_at(LocalDateTime.now());
         return rentalRepository.save(rental);
     }
 
-    // Méthode pour mettre à jour une rental par son ID
+    // Votre méthode updateRental reste inchangée
     public Rental updateRental(Long id, Rental rental) {
-        // Vérifie si la rental existe déjà
         Rental existingRental = rentalRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Location not found"));
-
-        // Mettre à jour les informations de la rental
-        existingRental.setName(rental.getName()); 
+                .orElseThrow(() -> new RuntimeException("Rental not found"));
+        existingRental.setName(rental.getName());
         existingRental.setDescription(rental.getDescription());
         existingRental.setPrice(rental.getPrice());
-   
-        // Ajoute d'autres champs à mettre à jour selon tes besoins.
-
-        // Sauvegarde la rental mise à jour dans la base de données
+        existingRental.setUpdated_at(LocalDateTime.now());
         return rentalRepository.save(existingRental);
     }
 

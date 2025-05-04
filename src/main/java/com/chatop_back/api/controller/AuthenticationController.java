@@ -30,7 +30,6 @@ public class AuthenticationController {
     
     @PostMapping("/login")
     public ResponseEntity<AuthSuccess> login(@RequestBody LoginRequest loginRequest) {
-        // Authentification via AuthenticationManager
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
         );

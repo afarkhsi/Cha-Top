@@ -1,34 +1,31 @@
 package com.chatop_back.api.payload;
 
+import com.chatop_back.api.model.Rental;
 import java.time.LocalDateTime;
 
-import com.chatop_back.api.model.Rental;
-
 public record RentalSingleResponse(
-	    Long id,
-	    String name,
-	    Double surface,
-	    Double price,
-	    String picture,
-	    String description,
-	    Long owner_id,
-	    LocalDateTime created_at,
-	    LocalDateTime updated_at
+    Long id,
+    String name,
+    Double surface,
+    Double price,
+    String picture,
+    String description,
+    Long owner_id,
+    LocalDateTime created_at,
+    LocalDateTime updated_at
 ) {
-	 public RentalSingleResponse(Rental rental) {
-	        this(
-	            rental.getId(),
-	            rental.getName(),
-	            rental.getSurface(),
-	            rental.getPrice(),
-	            rental.getPicture(),
-	            rental.getDescription(),
-	            rental.getOwner().getId(), // ⬅️ ici on expose juste l'ID
-	            rental.getCreated_at(),
-	            rental.getUpdated_at()
-	        );
-	   }
+    // Constructeur pour créer la réponse à partir d'un objet Rental
+    public RentalSingleResponse(Rental rental) {
+        this(
+            rental != null ? rental.getId() : null,
+            rental != null ? rental.getName() : null,
+            rental != null ? rental.getSurface() : null,
+            rental != null ? rental.getPrice() : null,
+            rental != null ? rental.getPicture() : null,
+            rental != null ? rental.getDescription() : null,
+            rental != null && rental.getOwner() != null ? rental.getOwner().getId() : null,
+            rental != null ? rental.getCreated_at() : null,
+            rental != null ? rental.getUpdated_at() : null
+        );
+    }
 }
-
-
-
