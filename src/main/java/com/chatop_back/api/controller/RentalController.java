@@ -61,6 +61,7 @@ public class RentalController {
         return ResponseEntity.ok(response);
     }
 
+    //TODO: Externaliser dans le service la logique d'injection de l'image
     // Endpoint pour créer une location avec upload d'image
     @Operation(summary = "Create a new rental", description = "Create a new rental entry with image upload")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
