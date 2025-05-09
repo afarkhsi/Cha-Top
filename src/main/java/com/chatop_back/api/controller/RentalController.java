@@ -3,12 +3,11 @@ import com.chatop_back.api.model.Rental;
 import com.chatop_back.api.payload.RentalSingleResponse;
 import com.chatop_back.api.payload.RentalsResponse;
 import com.chatop_back.api.payload.request.RentalUpdateRequest;
-import com.chatop_back.api.repository.UserRepository;
+import com.chatop_back.api.service.FileStorageService;
 import com.chatop_back.api.service.RentalService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,13 +16,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
@@ -31,17 +26,17 @@ import java.util.stream.Collectors;
 public class RentalController {
 
     private final RentalService rentalService;
-    private final UserRepository userRepository; 
+ 
     private final ModelMapper modelMapper;
+    private final FileStorageService fileStorageService;
     
     @Value("${upload.directory:uploads}")
     private String uploadDir;
 
-    @Autowired
-    public RentalController(RentalService rentalService, UserRepository userRepository, ModelMapper modelMapper) {
+    public RentalController(RentalService rentalService, ModelMapper modelMapper, FileStorageService fileStorageService) {
         this.rentalService = rentalService;
-        this.userRepository = userRepository;
         this.modelMapper = modelMapper;
+        this.fileStorageService = fileStorageService;
     }
 
     @Operation(summary = "Get all rentals", description = "Retrieve a list of all rentals")
@@ -64,7 +59,6 @@ public class RentalController {
         return ResponseEntity.ok(response);
     }
 
-    //TODO: Externaliser dans le service la logique d'injection de l'image
     // Endpoint pour créer une location avec upload d'image
     @Operation(summary = "Create a new rental", description = "Create a new rental entry with image upload")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -75,39 +69,24 @@ public class RentalController {
             @RequestParam("description") String description,
             @RequestParam("picture") MultipartFile picture) {
         
-        try {
-            // Créer le répertoire d'upload s'il n'existe pas
-            Path uploadPath = Paths.get(uploadDir);
-            if (!Files.exists(uploadPath)) {
-                Files.createDirectories(uploadPath);
-            }
+        try {  
+            // Sauvegarde de l'image
+            String fileName = fileStorageService.storeFile(picture);
             
-            // Générer un nom de fichier unique
-            String originalFilename = picture.getOriginalFilename();
-            String fileExtension = "";
-            if (originalFilename != null && originalFilename.contains(".")) {
-                fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
-            }
-            String fileName = UUID.randomUUID().toString() + fileExtension;
-            Path filePath = uploadPath.resolve(fileName);
-            
-            // Sauvegarder l'image
-            Files.copy(picture.getInputStream(), filePath);
-            
-            // Obtenir l'email de l'utilisateur authentifié
+            // Obtention de l'email de l'user authentifié
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String email = authentication.getName();
             if (email == null || email.equals("anonymousUser")) {
-                return ResponseEntity.status(401).build(); // Non autorisé
+                return ResponseEntity.status(401).build();
             }
             
-            // Créer l'objet Rental (sans setter l'owner ici)
+            // Créer l'objet Rental (sans set owner)
             Rental rental = new Rental();
             rental.setName(name);
             rental.setSurface(surface);
             rental.setPrice(price);
             rental.setDescription(description);
-            rental.setPicture(fileName);  // On stocke le nom du fichier
+            rental.setPicture(fileName);
             
             // La gestion de l'owner et des dates se fait dans le service
             Rental createdRental = rentalService.createRental(rental, email);

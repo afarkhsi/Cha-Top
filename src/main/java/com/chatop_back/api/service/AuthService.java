@@ -29,7 +29,7 @@ public class AuthService {
             throw new RuntimeException("Invalid password");
         }
         
-        // Utiliser correctement votre JWTService qui attend un objet Users
+        // Utilisation JWTService qui attend un objet Users
         String token = jwtService.generateToken(user);
         return AuthSuccess.builder().token(token).build();
     }
@@ -49,7 +49,7 @@ public class AuthService {
         
         user = userRepository.save(user);
         
-        // Utiliser correctement votre JWTService qui attend un objet Users
+        // Utilisation du JWTService qui attend un objet Users
         String token = jwtService.generateToken(user);
         return AuthSuccess.builder().token(token).build();
     }
@@ -67,7 +67,7 @@ public class AuthService {
                 .build();
     }
     
-    // Nouvelle méthode pour récupérer l'utilisateur courant par son email
+    // Methode pour récupérer l'utilisateur courant par son email
     public UserDto getCurrentUserByEmail(String email) {
         Users user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));

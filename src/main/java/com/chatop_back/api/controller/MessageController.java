@@ -3,7 +3,6 @@ package com.chatop_back.api.controller;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,7 +19,6 @@ public class MessageController {
 
     private final MessageService messageService;
 
-    @Autowired
     public MessageController(MessageService messageService) {
         this.messageService = messageService;
     }

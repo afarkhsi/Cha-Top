@@ -2,7 +2,6 @@ package com.chatop_back.api.service;
 
 import java.time.LocalDateTime;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.chatop_back.api.model.Message;
@@ -20,7 +19,6 @@ public class MessageService {
     private final UserRepository userRepository;
     private final RentalRepository rentalRepository;
 
-    @Autowired
     public MessageService(MessageRepository messageRepository, UserRepository userRepository, RentalRepository rentalRepository) {
         this.messageRepository = messageRepository;
         this.userRepository = userRepository;

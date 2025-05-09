@@ -21,7 +21,6 @@ public record RentalSingleResponse(
                 rental.getName(),
                 rental.getSurface(),
                 rental.getPrice(),
-                // Ici, vous concaténez le chemin pour former l'URL complète
                 "http://localhost:3001/uploads/" + rental.getPicture(),
                 rental.getDescription(),
                 rental.getOwner().getId(),

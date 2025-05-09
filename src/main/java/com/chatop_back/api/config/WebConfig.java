@@ -13,7 +13,7 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        // Permettre à toutes les requêtes de localhost:4200
+        // Permission de toutes les requêtes de localhost:4200
         registry.addMapping("/api/**")
                 .allowedOrigins("http://localhost:4200")
                 .allowedMethods("GET", "POST", "PUT", "DELETE")
@@ -22,11 +22,10 @@ public class WebConfig implements WebMvcConfigurer {
     }
     
 
+    // Hangler permettant d'obtenir le chemin absolu du dossier uploads
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        // Obtenir le chemin absolu du dossier uploads
         String absoluteUploadPath = Paths.get("uploads").toAbsolutePath().toString();
-        // Exemple : "file:/C:/chemin/vers/votre/projet/uploads/"
         registry.addResourceHandler("/uploads/**")
                 .addResourceLocations("file:" + absoluteUploadPath + "/");
     }

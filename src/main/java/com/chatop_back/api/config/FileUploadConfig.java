@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+// Cette configuration permet d'accéder aux images téléchargées via URL
 @Configuration
 public class FileUploadConfig implements WebMvcConfigurer {
 
@@ -16,8 +17,6 @@ public class FileUploadConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        // Cette configuration permet d'accéder aux images téléchargées via URL
-        // Par exemple: http://localhost:3001/uploads/image.jpg
         Path uploadPath = Paths.get(uploadDir);
         String uploadAbsolutePath = uploadPath.toFile().getAbsolutePath();
 
