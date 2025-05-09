@@ -2,6 +2,7 @@ package com.chatop_back.api.controller;
 import com.chatop_back.api.model.Rental;
 import com.chatop_back.api.payload.RentalSingleResponse;
 import com.chatop_back.api.payload.RentalsResponse;
+import com.chatop_back.api.payload.request.RentalUpdateRequest;
 import com.chatop_back.api.repository.UserRepository;
 import com.chatop_back.api.service.RentalService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -19,7 +20,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -117,19 +120,24 @@ public class RentalController {
             return ResponseEntity.internalServerError().build();
         } catch (Exception e) {
             e.printStackTrace();
-            // Ici, il vaudrait mieux retourner un objet d'erreur structuré ou un message dans le body.
             return ResponseEntity.status(500)
                     .body(new RentalSingleResponse(null, "Error: " + e.getMessage(), null, null, null, null, null, null, null));
         }
     }
 
     @Operation(summary = "Update a rental", description = "Update an existing rental entry")
-    @PutMapping("/{id}")
-    public ResponseEntity<RentalSingleResponse> updateRental(@PathVariable Long id, @RequestBody Rental rental) {
-        Rental updatedRental = rentalService.updateRental(id, rental);
-        RentalSingleResponse response = modelMapper.map(updatedRental, RentalSingleResponse.class);
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Map<String, String>> updateRental(
+            @PathVariable Long id, @ModelAttribute RentalUpdateRequest rentalRequest) { 
+
+        rentalService.updateRental(id, rentalRequest);
+
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Rental updated !");
+        
         return ResponseEntity.ok(response);
     }
+
 
     @Operation(summary = "Delete a rental", description = "Delete a rental by its ID")
     @DeleteMapping("/{id}")

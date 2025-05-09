@@ -13,9 +13,9 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        // Permettre à toutes les requêtes de localhost:4200 (ou l'URL de votre frontend)
+        // Permettre à toutes les requêtes de localhost:4200
         registry.addMapping("/api/**")
-                .allowedOrigins("http://localhost:4200") // Remplacez par l'URL de votre frontend
+                .allowedOrigins("http://localhost:4200")
                 .allowedMethods("GET", "POST", "PUT", "DELETE")
                 .allowedHeaders("*")
                 .allowCredentials(true);

@@ -2,6 +2,7 @@ package com.chatop_back.api.service;
 
 import com.chatop_back.api.model.Rental;
 import com.chatop_back.api.model.Users;
+import com.chatop_back.api.payload.request.RentalUpdateRequest;
 import com.chatop_back.api.repository.RentalRepository;
 import com.chatop_back.api.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +41,8 @@ public class RentalService {
         return rentalRepository.save(rental);
     }
 
-    // Votre méthode updateRental reste inchangée
+    // méthode updateRental
+   /** 
     public Rental updateRental(Long id, Rental rental) {
         Rental existingRental = rentalRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Rental not found"));
@@ -49,6 +51,20 @@ public class RentalService {
         existingRental.setPrice(rental.getPrice());
         existingRental.setUpdated_at(LocalDateTime.now());
         return rentalRepository.save(existingRental);
+    }**/
+    
+    public void updateRental(Long id, RentalUpdateRequest rentalRequest) {
+        Rental existingRental = rentalRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Rental not found"));
+
+        // Mettre à jour uniquement les champs envoyés par le client
+        existingRental.setName(rentalRequest.getName());
+        existingRental.setSurface(rentalRequest.getSurface());
+        existingRental.setPrice(rentalRequest.getPrice());
+        existingRental.setDescription(rentalRequest.getDescription());
+        existingRental.setUpdated_at(LocalDateTime.now());
+
+        rentalRepository.save(existingRental);
     }
 
     public void deleteRental(Long id) {

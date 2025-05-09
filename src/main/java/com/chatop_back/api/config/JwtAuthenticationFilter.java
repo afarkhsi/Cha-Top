@@ -46,7 +46,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     }
                 }
             } catch (JwtException e) {
-                // Le token est invalide : ici, on peut simplement ne rien faire
+                throw(e);
             }
         }
         filterChain.doFilter(request, response);
